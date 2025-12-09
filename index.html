@@ -1290,7 +1290,7 @@
         let currentQuiz = [];
         let currentQuestionIndex = 0;
         let score = 0;
-        let quizHistory = [];
+        let quizHistory = localStorage.getItem('quizHistory') ? JSON.parse(localStorage.getItem('quizHistory')) : [];
         let chartInstance = null;
         let isAnswering = false;
 
@@ -1312,7 +1312,25 @@
 
             showQuestion();
         }
+        Array.prototype.shuffle = function () {
+            let currentIndex = this.length,
+                randomIndex;
 
+            // While there remain elements to shuffle.
+            while (currentIndex !== 0) {
+
+                // Pick a remaining element.
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [this[currentIndex], this[randomIndex]] = [
+                    this[randomIndex], this[currentIndex]
+                ];
+            }
+
+            return this; // Returns the shuffled array (mutated in place)
+        };
         function showQuestion() {
             isAnswering = true;
             const qData = currentQuiz[currentQuestionIndex];
@@ -1329,7 +1347,7 @@
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
 
-            qData.options.forEach((opt, index) => {
+            qData.options.shuffle().forEach((opt, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.textContent = opt;
@@ -1390,7 +1408,7 @@
             }
         }
 
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 const nextBtn = document.getElementById('next-btn');
                 if (!nextBtn.classList.contains('hidden')) {
@@ -1412,6 +1430,7 @@
 
             // Save to History
             quizHistory.push(percent);
+            localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
         }
 
         function returnToStart() {
